@@ -1,0 +1,54 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: karnaval-gateway-reactive-server
+  config:
+    import: optional:configserver:http://localhost:9296
+
+resilience4j:
+  circuitbreaker:
+    metrics:
+      enabled: true
+    configs:
+      default:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 2s
+        failure-rate-threshold: 5
+        event-consumer-buffer-size: 10
+    instances:
+      ClienteCircuitBreaker:
+        base-config: default
+      EmpleadoCircuitBreaker:
+        sliding-window-size: 10
+        minimum-number-of-calls: 10
+        permitted-number-of-calls-in-half-open-state: 3
+        wait-duration-in-open-state: 1s
+        failure-rate-threshold: 50
+        event-consumer-buffer-size: 10
+      OrdenCircuitBreaker:
+        base-config: default
+      FaseCircuitBreaker:
+        base-config: default
+      TarifaCircuitBreaker:
+        base-config: default
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 1s
+        cancel-running-future: false
+    instances:
+      ClienteCircuitBreaker:
+        timeout-duration: 2s
+      EmpleadoCircuitBreaker:
+        timeout-duration: 2s
+      OrdenCircuitBreaker:
+        timeout-duration: 2s
+      FaseCircuitBreaker:
+        base-config: default
+      TarifaCircuitBreaker:
+        base-config: default
